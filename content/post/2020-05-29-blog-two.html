@@ -1,0 +1,423 @@
+---
+title: ggplot2 패키지
+author: 김채형
+date: '2020-05-29'
+slug: blog-two
+categories: []
+tags: []
+---
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<p>오늘은 ggplot2 패키지를 활용한 데이터 시각화에 대해 알아보고자 합니다.</p>
+<p>먼저 필요한 패키지들을 라이브러리 합니다.</p>
+<pre class="r"><code># 패키지 불러오기 #
+library(dplyr)
+library(ggplot2)
+library(gridExtra)
+
+# 그래프 폰트 설정하기 #
+theme_set(theme_gray(base_family = &quot;AppleGothic&quot;)) # ggplot2 package</code></pre>
+<p>다음으로 데이터셋을 불러옵니다. 이 중 1호선부터 9호선까지의 지하철 정보만 활용하려고 합니다.</p>
+<pre class="r"><code># 데이터 불러오기 #
+subway &lt;- read.csv(file = &quot;/Users/kimchaehyeong/Documents/cheche_datascience/R_Visualization/data/2018년 12월 지하철 승하차인원 데이터.csv&quot;, fileEncoding = &quot;EUC-KR&quot;)
+
+# 1호선 ~ 9호선 지하철 정보만 추출
+sw &lt;- subset(subway, subway$노선명 %in% paste(1:9, &quot;호선&quot;, sep = &quot;&quot;))</code></pre>
+<div id="산점도-scatter-plot" class="section level2">
+<h2>1. 산점도 (Scatter Plot)</h2>
+<p>기본적으로 <code>ggplot(data= 데이터명, aes(x=연속형데이터, y=연속형데이터)) + geom_point()</code>를 사용하여 산점도를 그릴 수 있습니다.</p>
+<p>먼저 <code>ggplot()</code> 함수를 활용하여 x축과 y축을 생성한 후, <code>geom_point()</code> 함수를 활용하여 산점도를 그립니다.</p>
+<pre class="r"><code>p &lt;- ggplot(data = sw, aes(x = 승차총승객수, y = 하차총승객수))
+
+sw %&gt;% 
+  ggplot(aes(x = 승차총승객수, y = 하차총승객수)) + # x축에는 승차총승객수, y축에는 하차총승객수를 할당하여 x축과 y축 생성
+  geom_point() # 산점도 출력</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<blockquote>
+<p>점 크기 : <code>size</code></p>
+</blockquote>
+<p><code>geom_point()</code> 함수에 <code>size</code> 인자를 추가하여 산점도의 점의 크기를 지정할 수 있습니다.</p>
+<pre class="r"><code>sw %&gt;% 
+  ggplot(aes(x = 승차총승객수, y = 하차총승객수)) + 
+  geom_point(size=2)</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<blockquote>
+<p>점 색깔 : <code>color</code></p>
+</blockquote>
+<p><code>geom_point()</code> 함수에 <code>color</code> 인자를 추가하여 산점도의 점의 색깔을 지정할 수 있습니다.</p>
+<pre class="r"><code>sw %&gt;% 
+  ggplot(aes(x = 승차총승객수, y = 하차총승객수)) + 
+  geom_point(color = &quot;blueviolet&quot;)</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>아래와 같이 노선 별로 점 색깔을 다르게 설정할 수도 있습니다.</p>
+<pre class="r"><code>sw %&gt;% 
+  ggplot(aes(x = 승차총승객수, y = 하차총승객수)) + 
+  geom_point(aes(color = 노선명)) # 노선에 따라 점 색깔을 다르게 출력</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<blockquote>
+<p>원하는 색으로 구분 : <code>scale_color_manual</code></p>
+</blockquote>
+<p><code>scale_color_manual()</code> 함수를 이용하여 사용자가 원하는 색깔을 지정할 수 있습니다.</p>
+<pre class="r"><code>sw %&gt;% 
+  ggplot(aes(x = 승차총승객수, y = 하차총승객수)) + 
+  geom_point(aes(color=노선명)) + # 노선명에 따라 점 색깔을 다르게 하여 산점도 출력
+  scale_color_manual(values=c(&quot;blue&quot;, &quot;DarkGreen&quot;, &quot;orange&quot;, &quot;skyblue&quot;, &quot;purple&quot;,&quot;brown&quot;, &quot;DarkOliveGreen&quot;,&quot;pink&quot;,&quot;gold&quot;)) # 노선명에 따라 다른 점 색깔을 사용자가 지정</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/scale_color_manual-1.png" width="672" /></p>
+<pre class="r"><code>
+color &lt;- scale_color_manual(values=c(&quot;blue&quot;, &quot;DarkGreen&quot;, &quot;orange&quot;, &quot;skyblue&quot;, &quot;purple&quot;,&quot;brown&quot;, &quot;DarkOliveGreen&quot;,&quot;pink&quot;,&quot;gold&quot;))</code></pre>
+<blockquote>
+<p>점 모양 : <code>shape</code></p>
+</blockquote>
+<p><code>geom_point()</code> 함수에 <code>shape</code> 인자를 추가하여 점의 모양을 선택할 수 있습니다. 인자 값으로 숫자를 할당할 경우 특정 모양으로 변경되고, 변수를 할당할 경우 변수의 범주 별로 점의 모양을 다르게 나타낼 수 있습니다.</p>
+<pre class="r"><code>sw %&gt;% 
+  ggplot(aes(x = 승차총승객수, y = 하차총승객수)) + 
+  geom_point(aes(shape = 노선명)) # 노선에 따라 점 모양을 다르게 출력
+## Warning: The shape palette can deal with a maximum of 6 discrete values because
+## more than 6 becomes difficult to discriminate; you have 9. Consider
+## specifying shapes manually if you must have them.
+## Warning: Removed 2790 rows containing missing values (geom_point).</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/shape-1.png" width="672" /></p>
+<blockquote>
+<p>원하는 모양으로 구분 : <code>scale_shape_manual</code></p>
+</blockquote>
+<p><code>scale_color_manual()</code> 함수를 이용하여 사용자가 원하는 모양을 지정할 수 있습니다.</p>
+<pre class="r"><code>qplot(data  = sw, 
+      x     = 승차총승객수, 
+      y     = 하차총승객수, 
+      shape = 노선명) +                # 노선에 따라 점 모양을 다르게 출력
+      scale_shape_manual(values = 1:9) # 노선에 따라 다른 점 모양을 사용자가 지정</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/scale_shape_manual-1.png" width="672" /></p>
+<pre class="r"><code>
+shape &lt;- scale_shape_manual(values = 1:length(levels(sw$노선명)))
+
+p + geom_point(aes(shape = 노선명)) + 
+  shape</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/scale_shape_manual-2.png" width="672" /></p>
+<blockquote>
+<p>범주 별 산점도 : <code>facet_wrap</code></p>
+</blockquote>
+<p>다음과 같이 노선 별로 하나씩 각각의 산점도를 그릴 수도 있습니다.</p>
+<pre class="r"><code>sw %&gt;% 
+  ggplot(aes(x = 승차총승객수, y = 하차총승객수)) + 
+  geom_point() +   
+  facet_wrap(~노선명) # 노선 별로 하나씩 각각의 산점도를 출력</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/facet_wrap-1.png" width="672" /></p>
+</div>
+<div id="막대그래프-bar-plot" class="section level2">
+<h2>2. 막대그래프 (Bar Plot)</h2>
+<p>기본적으로 <code>ggplot(data = 데이터명, aes(x=범주형데이터, weight=연속형데이터) + geom_bar()</code>를 사용하여 막대그래프를 그릴 수 있습니다.</p>
+<p>먼저 <code>ggplot()</code> 함수를 활용하여 x축과 y축을 생성한 후, <code>geom_bar()</code> 함수를 활용하여 막대그래프를 그립니다.</p>
+<pre class="r"><code>b &lt;- ggplot(data=sw, aes(x = 노선명, weight = 승차총승객수)) 
+
+sw %&gt;% 
+  ggplot(aes(x = 노선명, weight = 승차총승객수)) + # x축에 노선명, y축에 승차총승객수를 할당하여 x축과 y축 생성
+  geom_bar() # x축과 y축 생성 + 막대그래프 출력</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<blockquote>
+<p>막대 색깔 : <code>fill</code></p>
+</blockquote>
+<p>막대그래프의 막대의 색깔은 <code>fill</code>을 사용하여 지정할 수 있습니다.</p>
+<pre class="r"><code>qplot(data   = sw, 
+      x      = 노선명, 
+      weight = 승차총승객수, 
+      geom   = &quot;bar&quot;, 
+      fill   = I(&quot;darkmagenta&quot;)) # 막대 색깔을 할당한 하나의 색깔로 출력</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p>다음과 같이 변수의 범주에 따라 막대 색깔을 다르게 그래프를 나타낼 수도 있습니다.</p>
+<pre class="r"><code>qplot(data   = sw, 
+      x      = 노선명, 
+      weight = 승차총승객수, 
+      geom   = &quot;bar&quot;, 
+      fill   = 노선명) # 노선 별로 막대 색깔을 다르게 출력</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>다음은 왼쪽부터 차례대로 막대 색깔을 하나의 색깔로 출력한 그래프, 변수의 범주 별로 막대 테두리 색깔을 다르게 출력한 그래프, 변수의 범주 별로 막대 색깔을 다르게 출력한 그래프입니다.</p>
+<pre class="r"><code>b + geom_bar(fill = &quot;violetred4&quot;) -&gt; b1 # 막대 색깔을 하나의 색깔로 출력
+
+b + geom_bar(aes(color = 노선명)) -&gt; b2 # 노선 별로 막대 테두리 색깔을 다르게 출력
+
+b + geom_bar(aes(fill = 노선명)) -&gt; b3 # 노선 별로 막대 색깔을 다르게 출력
+
+gridExtra::grid.arrange(b1, b2, b3, nrow=1, ncol=3)</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<blockquote>
+<p>원하는 색으로 구분 : <code>scale_fill_manual</code></p>
+</blockquote>
+<p><code>scale_fill_manual()</code> 함수를 이용하여 사용자가 원하는 색깔을 지정할 수 있습니다.</p>
+<pre class="r"><code>b + 
+  geom_bar(aes(fill = 노선명)) +
+  scale_fill_manual(values = c(&quot;blue&quot;, &quot;darkgreen&quot;, &quot;orange&quot;,&quot;skyblue&quot;, &quot;purple&quot;, &quot;brown&quot;, &quot;darkolivegreen&quot;, &quot;pink&quot;, &quot;gold&quot;))</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<pre class="r"><code>
+fill &lt;- scale_fill_manual(values = c(&quot;blue&quot;, &quot;darkgreen&quot;, &quot;orange&quot;, &quot;skyblue&quot;, &quot;purple&quot;,&quot;brown&quot;, &quot;darkolivegreen&quot;, &quot;pink&quot;, &quot;gold&quot;))</code></pre>
+<blockquote>
+<p>가로 막대그래프 : <code>coord_flip</code></p>
+</blockquote>
+<p><code>coord_flip()</code> 함수를 활용하여 막대그래프를 가로로 눕힌 방향으로 출력할 수도 있습니다.</p>
+<pre class="r"><code>b + 
+  geom_bar() + 
+  scale_fill_manual(values = c(&quot;blue&quot;, &quot;darkgreen&quot;, &quot;orange&quot;,&quot;skyblue&quot;, &quot;purple&quot;, &quot;brown&quot;, &quot;darkolivegreen&quot;, &quot;pink&quot;, &quot;gold&quot;)) + 
+  coord_flip()</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<blockquote>
+<p>범례 위치 조정 : <code>legend.position</code></p>
+</blockquote>
+<p><code>theme()</code> 함수에 <code>legend.position</code> 인자를 추가하여 범례의 위치를 지정할 수 있습니다. 이때 인자 값은 ‘top’, ‘bottom’, ‘right’, ‘left’ 네가지 중 하나로 넣습니다.</p>
+<pre class="r"><code>b + 
+  geom_bar(aes(fill=노선명)) + 
+  scale_fill_manual(values = c(&quot;blue&quot;, &quot;darkgreen&quot;, &quot;orange&quot;,&quot;skyblue&quot;, &quot;purple&quot;, &quot;brown&quot;, &quot;darkolivegreen&quot;, &quot;pink&quot;, &quot;gold&quot;)) + 
+  theme(legend.position=&quot;top&quot;) +
+  ggtitle(&#39;범례 위치가 top일 때&#39;) -&gt; b1
+
+b + 
+  geom_bar(aes(fill=노선명)) + 
+  scale_fill_manual(values = c(&quot;blue&quot;, &quot;darkgreen&quot;, &quot;orange&quot;,&quot;skyblue&quot;, &quot;purple&quot;, &quot;brown&quot;, &quot;darkolivegreen&quot;, &quot;pink&quot;, &quot;gold&quot;)) +  
+  theme(legend.position=&quot;bottom&quot;) +
+  ggtitle(&#39;범례 위치가 bottom일 때&#39;) -&gt; b2
+
+b + 
+  geom_bar(aes(fill=노선명)) + 
+  scale_fill_manual(values = c(&quot;blue&quot;, &quot;darkgreen&quot;, &quot;orange&quot;,&quot;skyblue&quot;, &quot;purple&quot;, &quot;brown&quot;, &quot;darkolivegreen&quot;, &quot;pink&quot;, &quot;gold&quot;)) + 
+  theme(legend.position=&quot;right&quot;) +
+  ggtitle(&#39;범례 위치가 right일 때&#39;)-&gt; b3
+
+b + 
+  geom_bar(aes(fill=노선명)) + 
+  scale_fill_manual(values = c(&quot;blue&quot;, &quot;darkgreen&quot;, &quot;orange&quot;,&quot;skyblue&quot;, &quot;purple&quot;, &quot;brown&quot;, &quot;darkolivegreen&quot;, &quot;pink&quot;, &quot;gold&quot;)) + 
+  theme(legend.position=&quot;left&quot;) +
+  ggtitle(&#39;범례 위치가 left일 때&#39;) -&gt; b4
+
+gridExtra::grid.arrange(b1, b2, b3, b4, nrow = 2, ncol = 2)</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<blockquote>
+<p>막대 너비 조정 : <code>width</code></p>
+</blockquote>
+<p><code>width</code> 인자에 값을 지정하여 막대의 너비를 조정할 수 있습니다.</p>
+<pre class="r"><code>par(mfrow=c(1,3))
+b + geom_bar(width=0.5) -&gt; b1
+b + geom_bar(width=0.2) -&gt; b2
+b + geom_bar(width=0.9) -&gt; b3
+gridExtra::grid.arrange(b1, b2, b3, nrow=1, ncol=3)</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<blockquote>
+<p>선택된 항목만 표시 : <code>scale_x_discrete</code></p>
+</blockquote>
+<p>x축에서 특정 부분만 표시하고 싶을 때 <code>scale_x_discrete()</code> 함수를 사용하여 이를 지정해줄 수 있다.</p>
+<pre class="r"><code>b + 
+  geom_bar() + 
+  scale_x_discrete(limits=c(&quot;1호선&quot;, &quot;2호선&quot;)) # 1호선과 2호선만 출력
+## Warning: Removed 7240 rows containing non-finite values (stat_count).</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<pre class="r"><code>
+b + 
+  geom_bar(width=0.5) + 
+  scale_x_discrete(limits=c(&quot;1호선&quot;, &quot;2호선&quot;))
+## Warning: Removed 7240 rows containing non-finite values (stat_count).</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-14-2.png" width="672" /></p>
+</div>
+<div id="상자그림-box-plot" class="section level2">
+<h2>3. 상자그림 (Box Plot)</h2>
+<p>기본적으로 <code>ggplot(data=데이터명, aes(x=범주형데이터, y=연속형데이터)) + geom_boxplot()</code>를 사용하여 상자그림을 그릴 수 있습니다.</p>
+<p>먼저 <code>ggplot()</code> 함수를 활용하여 x축과 y축을 생성한 후, <code>geom_boxplot()</code> 함수를 활용하여 상자그림을 그립니다.</p>
+<pre class="r"><code>box &lt;- ggplot(data = sw, mapping = aes(x=노선명, y=승차총승객수))
+
+sw %&gt;% 
+  ggplot(mapping = aes(x=노선명, y=승차총승객수)) +
+  geom_boxplot()</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<blockquote>
+<p>박스 색깔 지정 : <code>fill</code></p>
+</blockquote>
+<p>상자의 색깔은 <code>fill</code>을 사용하여 지정할 수 있습니다.</p>
+<blockquote>
+<p>상자 위 모든 점의 위치 표시 : <code>geom_jitter()</code></p>
+</blockquote>
+<p><code>geom_jitter()</code> 함수를 활용하여 상자그림에 산점도를 더하여 표현할 수 있습니다. 상자 위에 모든 점이 표시됩니다.</p>
+<pre class="r"><code>box + geom_boxplot() + geom_jitter() # 상자그림 위에 산점도 그림</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<pre class="r"><code>box + geom_boxplot() + geom_jitter(width=0.1, mapping = aes(color=노선명))</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-16-2.png" width="672" /></p>
+<blockquote>
+<p>가로 상자그림 : <code>coord_flip()</code></p>
+</blockquote>
+<p><code>coord_flip()</code> 함수를 활용하여 상자그림을 가로로 눕힌 방향으로 출력할 수도 있습니다.</p>
+<pre class="r"><code>box + geom_boxplot() + coord_flip()</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<blockquote>
+<p>이상치(outlier) 강조 : <code>outlier.color</code>, <code>outlier.shape</code></p>
+</blockquote>
+<p><code>geom_boxplot()</code> 함수에 <code>outlier.color</code> 인자를 추가하여 이상치의 색깔을 지정할 수 있습니다. <code>geom_boxplot()</code> 함수에 <code>outlier.shape</code>를 추가하여 이상치의 모양을 지정할 수 있습니다.</p>
+<pre class="r"><code>box + 
+  geom_boxplot(outlier.color = &quot;red&quot;, outlier.shape = 2) + 
+  color</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+</div>
+<div id="히스토그램-histogram" class="section level2">
+<h2>4. 히스토그램 (Histogram)</h2>
+<p>기본적으로 <code>ggplot(data=데이터명, aes(x=연속형데이터)) + geom_histogram()</code>를 사용하여 히스토그램을 그릴 수 있습니다.</p>
+<p>먼저 <code>ggplot()</code> 함수를 활용하여 x축과 y축을 생성한 후, <code>geom_histogram()</code> 함수를 활용하여 히스토그램을 그립니다.</p>
+<pre class="r"><code>h &lt;- ggplot(data    = sw, 
+            mapping = aes(x = 승차총승객수))
+h + geom_histogram()
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<blockquote>
+<p>간격 : <code>bins</code>, <code>binwidth</code></p>
+</blockquote>
+<pre class="r"><code>h + geom_histogram(bins=10)</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+<pre class="r"><code>h + geom_histogram(bins=50)</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-20-2.png" width="672" /></p>
+<pre class="r"><code>h + geom_histogram(binwidth=10000)</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-20-3.png" width="672" /></p>
+<blockquote>
+<p>색깔 지정 : <code>color</code>, <code>fill</code></p>
+</blockquote>
+<pre class="r"><code>h + geom_histogram(color = &quot;snow4&quot;)
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+<pre class="r"><code>
+h + geom_histogram(fill=&quot;seagreen&quot;, color=&quot;white&quot;)
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-21-2.png" width="672" /></p>
+<pre class="r"><code>h + geom_histogram(bins=30, aes(fill=노선명)) + fill + facet_wrap(~노선명)</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-21-3.png" width="672" /></p>
+<pre class="r"><code>
+h + geom_histogram(bins=30, aes(fill=sw$노선명)) + fill</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-21-4.png" width="672" /></p>
+<blockquote>
+<p>x축, y축 값 표시 : <code>scale_x_continuous</code>, <code>scale_y_continuous</code></p>
+</blockquote>
+<pre class="r"><code>axis.x &lt;- scale_x_continuous(breaks = seq(0, max(sw$승차총승객수), 20000))
+axis.y &lt;- scale_y_continuous(breaks = seq(0, max(sw$승차총승객수), 100))
+
+h + geom_histogram() + axis.x + axis.y
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
+<blockquote>
+<p>확률밀도 히스토그램</p>
+</blockquote>
+<p><code>geom_histogram()</code> 함수 대신 <code>geom_density()</code> 함수를 이용하면 윤곽선으로 표현된 확률밀도 히스토그램을 그릴 수 있다. <code>geom_histogram()</code> 함수에 <code>stat = 'density'</code>를 인자로 추가할 경우 면적으로 표현된 확률밀도 히스토그램을 그릴 수 있다.</p>
+<pre class="r"><code>h + geom_density() # 윤곽선으로 표현</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+<pre class="r"><code>h + geom_histogram(stat=&quot;density&quot;) # 면적으로 표현 # y축을 density로 변경
+## Warning: Ignoring unknown parameters: binwidth, bins, pad</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-23-2.png" width="672" /></p>
+<pre class="r"><code>h + geom_histogram(stat=&quot;density&quot;) + geom_density() # 면적 + 윤곽선으로 표현
+## Warning: Ignoring unknown parameters: binwidth, bins, pad</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-23-3.png" width="672" /></p>
+<pre class="r"><code>h + geom_density(aes(colour=노선명)) # 노선 별로 </code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-23-4.png" width="672" /></p>
+</div>
+<div id="선-그래프-시계열-그래프" class="section level2">
+<h2>5. 선 그래프 (시계열 그래프)</h2>
+<p>기본적으로 <code>ggplot(data=데이터명, aes(x=날짜데이터, y=연속형데이터)) + geom_line()</code>를 사용하여 선 그래프를 그릴 수 있습니다.</p>
+<p>먼저 <code>ggplot()</code> 함수를 활용하여 x축과 y축을 생성한 후, <code>geom_line()</code> 함수를 활용하여 선 그래프를 그립니다.</p>
+<pre class="r"><code>l &lt;- ggplot(data = sw, aes(x = 사용일자, y = 승차총승객수))
+
+sw %&gt;% 
+  ggplot(aes(x = 사용일자, y = 승차총승객수)) + 
+  geom_line()</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
+<blockquote>
+<p>선 굵기 및 타입 설정 : <code>lwd</code>, <code>lty</code></p>
+</blockquote>
+<pre class="r"><code>station &lt;- &quot;강남&quot;
+st &lt;- subset(subway, subset = subway$역명 == station)
+l &lt;- ggplot(data=st, aes(x=사용일자, y=승차총승객수))
+
+l + geom_line(lwd=2) -&gt; l1
+l + geom_line(lty=2) -&gt; l2
+l + geom_line(lwd = 0.5, lty=4) -&gt; l3
+gridExtra::grid.arrange(l1, l2, l2, nrow=1, ncol=3)</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-25-1.png" width="672" /></p>
+</div>
+<div id="기타" class="section level2">
+<h2>6. 기타</h2>
+<blockquote>
+<p>그래프 배경 테마</p>
+</blockquote>
+<ul>
+<li>theme_bw()</li>
+<li>theme_classic()</li>
+<li>theme_dark()</li>
+<li>theme_grey() : default</li>
+<li>theme_light()</li>
+<li>theme_linedraw()</li>
+</ul>
+<blockquote>
+<p>그래프 제목 : <code>ggtitle</code></p>
+</blockquote>
+<p><code>ggtitle()</code> 함수를 이용하여 그래프 제목을 넣을 수 있다. 이때 <code>subtitle</code> 인자를 추가할 경우 부제목도 표현할 수 있다.</p>
+<pre class="r"><code>p + geom_point() + ggtitle(&quot;강남역 일별 승차총승객수 현황&quot;,
+                       subtitle=&quot;2018 1월&quot;)</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-26-1.png" width="672" /></p>
+<blockquote>
+<p>축 제목 : <code>xlab</code>, <code>ylab</code></p>
+</blockquote>
+<pre class="r"><code>p + 
+  geom_point() + 
+  ggtitle(&quot;강남역 일별 승차총승객수 현황&quot;, subtitle=&quot;2018 1월&quot;) + 
+  xlab(&quot;일자&quot;) + 
+  ylab(&quot;승차인원수&quot;)</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
+<blockquote>
+<p>참조선 그리기 : <code>geom_vline</code>, <code>geom_hline</code></p>
+</blockquote>
+<p><code>geom_vline()</code> 함수는 세로선을, <code>geom_hline()</code> 함수는 가로선을 추가하는 데에 사용된다.</p>
+<pre class="r"><code>p + geom_point() + geom_vline(xintercept = 60000, lty = 2)</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
+<pre class="r"><code>
+p + geom_point() + geom_hline(yintercept = 70000, lty = 2)</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-28-2.png" width="672" /></p>
+<pre class="r"><code>
+p + geom_point() + 
+  geom_vline(xintercept = 10000, lty=2) + 
+  geom_hline(yintercept = 10000, lty=2)</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-28-3.png" width="672" /></p>
+<blockquote>
+<p>색 그라데이션 주기 : <code>scale_colour_gradient</code></p>
+</blockquote>
+<p><code>scale_colour_gradient()</code> 함수를 활용하여 색의 그라데이션을 표현할 수 있다. 이때 디폴트값은 blue이다.</p>
+<pre class="r"><code>
+p + geom_point(aes(color = 승차총승객수))</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
+<pre class="r"><code>
+p + geom_point(aes(color = 승차총승객수)) + scale_color_gradient(low = &quot;pink&quot;, high = &quot;purple&quot;)</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-29-2.png" width="672" /></p>
+<pre class="r"><code>
+p + geom_point(aes(colour=sw$승차총승객수)) + 
+  scale_colour_gradient(low=&quot;gray&quot;, high=&quot;black&quot;) </code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-29-3.png" width="672" /></p>
+<blockquote>
+<p>그래프 화면 분할 : <code>grid.arrange</code></p>
+</blockquote>
+<p><code>gridExtra</code> 패키지의 <code>grid.arrange()</code> 함수를 이용하여 한 화면에 여러개의 그래프를 나타낼 수 있습니다.</p>
+<pre class="r"><code>b + 
+  geom_bar(aes(fill=노선명)) + 
+  scale_fill_manual(values = c(&quot;blue&quot;, &quot;darkgreen&quot;, &quot;orange&quot;,&quot;skyblue&quot;, &quot;purple&quot;, &quot;brown&quot;, &quot;darkolivegreen&quot;, &quot;pink&quot;, &quot;gold&quot;)) + 
+  theme(legend.position=&quot;top&quot;) -&gt; b1
+
+b + 
+  geom_bar(aes(fill=노선명)) + 
+  scale_fill_manual(values = c(&quot;blue&quot;, &quot;darkgreen&quot;, &quot;orange&quot;,&quot;skyblue&quot;, &quot;purple&quot;, &quot;brown&quot;, &quot;darkolivegreen&quot;, &quot;pink&quot;, &quot;gold&quot;)) + 
+  theme(legend.position=&quot;bottom&quot;) -&gt;b2
+
+b + 
+  geom_bar(aes(fill=노선명)) + 
+  scale_fill_manual(values = c(&quot;blue&quot;, &quot;darkgreen&quot;, &quot;orange&quot;,&quot;skyblue&quot;, &quot;purple&quot;, &quot;brown&quot;, &quot;darkolivegreen&quot;, &quot;pink&quot;, &quot;gold&quot;)) + 
+  theme(legend.position=&quot;right&quot;) -&gt;b3
+
+b + 
+  geom_bar(aes(fill=노선명)) + 
+  scale_fill_manual(values = c(&quot;blue&quot;, &quot;darkgreen&quot;, &quot;orange&quot;,&quot;skyblue&quot;, &quot;purple&quot;, &quot;brown&quot;, &quot;darkolivegreen&quot;, &quot;pink&quot;, &quot;gold&quot;)) + 
+  theme(legend.position=&quot;left&quot;) -&gt;b4
+
+gridExtra::grid.arrange(b1, b2, b3, b4, nrow = 2, ncol = 2)</code></pre>
+<p><img src="/post/2020-05-29-blog-two_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
+<blockquote>
+<p>그래프 저장 : <code>ggsave</code></p>
+</blockquote>
+<p><code>ggsave()</code> 함수에 경로를 할당하여 그래프를 저장할 수 있습니다. 이때 파일 형태는 png, jpg, pdf가 가능합니다.</p>
+</div>

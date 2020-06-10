@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.69.0" />
+
+
+<title>stringr 패키지 - A Hugo website</title>
+<meta property="og:title" content="stringr 패키지 - A Hugo website">
+
+
+  <link href='/favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/css/fonts.css" media="all">
+<link rel="stylesheet" href="/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/images/logo.png"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/about/">About</a></li>
+    
+    <li><a href="https://github.com/rstudio/blogdown">GitHub</a></li>
+    
+    <li><a href="https://twitter.com/rstudio">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">5 min read</span>
+    
+
+    <h1 class="article-title">stringr 패키지</h1>
+
+    
+    <span class="article-date">2020-06-01</span>
+    
+
+    <div class="article-content">
+      
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<p>오늘은 stringr 패키지의 주요 함수에 대해 알아보고자 합니다. stringr 패키지는 텍스트 데이터 전처리를 위해 필요한 함수들을 제공합니다.</p>
+<p>stringr 패키지의 주요 함수로는 다음과 같은 작업을 할 수 있습니다.</p>
+<ul>
+<li><code>str_detect</code> : 문자열이 패턴을 포함하고 있는지 확인하기</li>
+<li><code>str_remove</code> : 문자열로부터 특정 패턴을 삭제하기</li>
+<li><code>str_replace</code> : 문자열로부터 특정 패턴을 다른 패턴으로 교체하기</li>
+<li><code>str_extract</code> : 문자열로부터 특정 패턴을 추출하기</li>
+<li><code>str_sub</code> : 문자열을 인덱스로 자르기</li>
+<li><code>str_c</code> : 여러 문자열을 하나로 묶기</li>
+<li><code>str_split</code> : 문자열을 구분자를 기준으로 분리하기</li>
+<li><code>str_trim</code> : 문자열의 양 옆에 있는 공백 제거하기</li>
+</ul>
+<p>먼저 필요한 패키지들을 라이브러리 합니다.</p>
+<pre class="r"><code>library(dplyr)
+library(tidyverse)
+library(stringr)</code></pre>
+<div id="str_detect" class="section level2">
+<h2>str_detect</h2>
+<p><code>str_detect</code> 함수는 문자열에 지정된 패턴이 포함되어 있는지 확인하여 포함되어 있으면 TRUE 포함되어 있지 않으면 FALSE를 출력합니다.</p>
+<pre class="r"><code>string &lt;- &quot;동해물과 백두산이 마르고 닳도록 하느님이 보우하사 우리나라 만세&quot;
+
+string %&gt;% 
+  str_detect(pattern = &quot;우리나라&quot;)
+## [1] TRUE
+
+string %&gt;% 
+  str_detect(pattern = &quot;하나님&quot;)
+## [1] FALSE
+
+string %&gt;% 
+  str_detect(pattern = &quot;하.님&quot;) # . : 줄바꿈을 제외한 모든 글자 하나
+## [1] TRUE</code></pre>
+</div>
+<div id="str_remove" class="section level2">
+<h2>str_remove</h2>
+<p><code>str_remove</code> 함수는 문자열로부터 지정된 패턴을 삭제합니다.</p>
+<pre class="r"><code>string &lt;- &quot;동해물과 백두산이 마르고 닳도록 하느님이 보우하사 우리나라 만세&quot;
+
+string %&gt;% 
+  str_remove(pattern = &quot; &quot;) # 지정된 패턴을 문자열에서 한번 삭제
+## [1] &quot;동해물과백두산이 마르고 닳도록 하느님이 보우하사 우리나라 만세&quot;</code></pre>
+<p>이때 <code>str_remove()</code> 함수는 문자열에서 맨 처음 나오는 패턴을 한번 삭제하는 것을 볼 수 있습니다. 지정된 패턴이 여러번 나오는 경우, <code>str_remove_all()</code> 함수를 통해 지정된 패턴을 문자열에서 모두 삭제할 수 있습니다.</p>
+<pre class="r"><code>string %&gt;% 
+  str_remove_all(pattern = &quot; &quot;) # 지정된 패턴을 문자열에서 모두 삭제
+## [1] &quot;동해물과백두산이마르고닳도록하느님이보우하사우리나라만세&quot;
+
+string2 &lt;- c(&quot;동해 물과 백두 산이&quot;, &quot;서해 바다는 산이 없다&quot;)
+
+string2 %&gt;% 
+  str_remove(pattern = &quot; &quot;) # 각각의 원소인 문자열에서 첫번째 공백만 제거
+## [1] &quot;동해물과 백두 산이&quot;   &quot;서해바다는 산이 없다&quot;
+
+string2 %&gt;% 
+  str_remove_all(pattern = &quot; &quot;) # 각각의 원소인 문자열에서 모든 공백을 제거
+## [1] &quot;동해물과백두산이&quot;   &quot;서해바다는산이없다&quot;</code></pre>
+</div>
+<div id="str_replace" class="section level2">
+<h2>str_replace</h2>
+<p><code>str_replace</code> 함수는 문자열로부터 지정된 패턴을 다른 패턴으로 교체합니다.</p>
+<pre class="r"><code>string &lt;- &quot;동해물과 백두산이 마르고 닳도록 하느님이 보우하사 우리나라 만세&quot;
+
+string %&gt;% 
+  str_replace(pattern = &quot; &quot;, replacement = &quot;_&quot;)
+## [1] &quot;동해물과_백두산이 마르고 닳도록 하느님이 보우하사 우리나라 만세&quot;
+# 각 문자열에 대하여 지정된 패턴을 다른 패턴으로 한번 교체</code></pre>
+<p>이때 <code>str_replace()</code> 함수는 문자열에서 맨 처음 나오는 패턴을 한번 교체하는 것을 볼 수 있습니다. 지정된 패턴이 여러번 나오는 경우, <code>str_replace_all()</code> 함수를 통해 지정된 패턴을 문자열에서 모두 교체할 수 있습니다.</p>
+<pre class="r"><code>string %&gt;% 
+  str_replace_all(pattern = &quot; &quot;, replacement = &quot;_&quot;)
+## [1] &quot;동해물과_백두산이_마르고_닳도록_하느님이_보우하사_우리나라_만세&quot;
+# 각 문자열에 대하여 지정된 패턴을 다른 패턴으로 모두 교체</code></pre>
+</div>
+<div id="str_extract" class="section level2">
+<h2>str_extract</h2>
+<p><code>str_extract</code> 함수는 문자열로부터 지정된 패턴을 추출합니다.</p>
+<pre class="r"><code>string &lt;- &quot;동해물과 백두산이 마르고 닳도록 하느님이 보우하사 우리나라 만세&quot;
+
+string %&gt;% 
+  str_extract(pattern = &quot;우&quot;)
+## [1] &quot;우&quot;
+# vector 형태로 출력</code></pre>
+<p>이때 <code>str_extract()</code> 함수는 문자열에서 맨 처음 나오는 패턴을 한번 추출하는 것을 볼 수 있습니다. 지정된 패턴이 여러번 나오는 경우, <code>str_extract_all()</code> 함수를 통해 지정된 패턴을 문자열에서 모두 추출할 수 있습니다.</p>
+<pre class="r"><code>string %&gt;% 
+  str_extract_all(pattern = &quot;우&quot;)
+## [[1]]
+## [1] &quot;우&quot; &quot;우&quot;
+# list 형태로 출력</code></pre>
+<p>단 <code>str_extract()</code> 함수는 vector 형태로 결과를 출력하는 반면 <code>str_extract_all()</code> 함수는 list 형태로 결과를 출력한다는 점에 유의해야 합니다. <code>str_extract_all()</code> 함수 안에 <code>simplify = TRUE</code> 인자를 추가할 경우 list 대신 matrix로 결과를 출력합니다.</p>
+<pre class="r"><code>string %&gt;% 
+  str_extract_all(pattern = &quot;우&quot;, simplify = TRUE)
+##      [,1] [,2]
+## [1,] &quot;우&quot; &quot;우&quot;
+# matrix 형태로 출력</code></pre>
+<p>각각의 문자열을 원소로 갖는, 즉 원소가 여러개인 vector를 <code>str_extract_all()</code> 함수에 할당해보면 이를 보다 잘 이해할 수 있습니다.</p>
+<pre class="r"><code>string1 &lt;- c(&#39;우&#39;, &#39;우우수&#39;, &#39;수수&#39;, &#39;우수수&#39;, &#39;우수우수&#39;)
+
+string1 %&gt;% 
+  str_extract_all(pattern = &#39;우&#39;)
+## [[1]]
+## [1] &quot;우&quot;
+## 
+## [[2]]
+## [1] &quot;우&quot; &quot;우&quot;
+## 
+## [[3]]
+## character(0)
+## 
+## [[4]]
+## [1] &quot;우&quot;
+## 
+## [[5]]
+## [1] &quot;우&quot; &quot;우&quot;
+
+string1 %&gt;% 
+  str_extract_all(pattern = &#39;우&#39;, simplify = TRUE)
+##      [,1] [,2]
+## [1,] &quot;우&quot; &quot;&quot;  
+## [2,] &quot;우&quot; &quot;우&quot;
+## [3,] &quot;&quot;   &quot;&quot;  
+## [4,] &quot;우&quot; &quot;&quot;  
+## [5,] &quot;우&quot; &quot;우&quot;</code></pre>
+</div>
+<div id="str_sub" class="section level2">
+<h2>str_sub</h2>
+<p><code>str_sub</code> 함수는 문자열의 인덱스를 이용하여 문자열 인덱싱을 가능하게 합니다.</p>
+<pre class="r"><code>string &lt;- &quot;동해물과 백두산이 마르고 닳도록 하느님이 보우하사 우리나라 만세&quot;
+
+string %&gt;% 
+  str_sub(start = 1, end = 2)
+## [1] &quot;동해&quot;
+
+string %&gt;% 
+  str_sub(start = 3, end = 4)
+## [1] &quot;물과&quot;
+
+string %&gt;% 
+  str_sub(start = 5, end = 7)
+## [1] &quot; 백두&quot;</code></pre>
+<p><code>str_extract</code> 함수는 패턴을 지정하여 지정된 패턴과 일치하는 부분을 추출한다면, <code>str_sub</code> 함수는 인덱스를 지정하여 지정된 인덱스에 해당되는 부분을 추출한다고 볼 수 있습니다.</p>
+</div>
+<div id="str_c" class="section level2">
+<h2>str_c</h2>
+<p><code>str_c</code> 함수는 여러개의 문자열을 한개의 문자열로 묶어줍니다. 즉 문자열 바인딩을 가능하게 합니다.</p>
+<pre class="r"><code>str_c(&quot;우리나라&quot;, &quot;만세&quot;, &quot;대박&quot;)
+## [1] &quot;우리나라만세대박&quot;</code></pre>
+<p><code>str_c()</code> 함수에 <code>sep = ""</code>를 인자로 추가할 경우, 지정된 구분자로 문자열을 합칠 수 있습니다.</p>
+<pre class="r"><code>str_c(&quot;우리나라&quot;, &quot;만세&quot;, sep = &quot; &quot;)
+## [1] &quot;우리나라 만세&quot;
+str_c(&quot;우리나라&quot;, &quot;만세&quot;, sep = &quot;+&quot;)
+## [1] &quot;우리나라+만세&quot;</code></pre>
+<p><code>str_c()</code> 함수에 <code>collapse = ""</code>를 인자로 추가할 경우, 지정된 구분자로 문자열을 합칠 수 있습니다.</p>
+<pre class="r"><code>string2 &lt;- c(&quot;동해물과&quot;, &quot;백두산이&quot;, &quot;마르고&quot;, &quot;닳도록&quot;, &quot;하느님이&quot;, &quot;보우하사&quot;, &quot;우리나라&quot;, &quot;만세&quot;)
+
+string2 %&gt;% 
+  str_c(collapse = &quot; &quot;)
+## [1] &quot;동해물과 백두산이 마르고 닳도록 하느님이 보우하사 우리나라 만세&quot;</code></pre>
+<p>정리해보자면, <code>sep = ""</code> 인자는 <code>str_c()</code> 함수에 문자열들을 직접 할당했을 때 사용하는 반면 <code>collapse = ""</code> 인자는 <code>str_c()</code> 함수에 문자열들을 원소로 갖는 vector를 할당했을 때 사용합니다.</p>
+</div>
+<div id="str_split" class="section level2">
+<h2>str_split</h2>
+<p><code>str_split</code> 함수는 문자열을 분리하는 기능을 합니다. 한개의 문자열을 특정 구분자를 기준으로 여러개의 문자열로 분리합니다. 이때 결과는 무조건 list로 반환합니다.</p>
+<pre class="r"><code>string &lt;- &quot;동해물과 백두산이 마르고 닳도록 하느님이 보우하사 우리나라 만세&quot;
+
+string %&gt;% 
+  str_split(pattern = &quot; &quot;) %&gt;% 
+  unlist()
+## [1] &quot;동해물과&quot; &quot;백두산이&quot; &quot;마르고&quot;   &quot;닳도록&quot;   &quot;하느님이&quot; &quot;보우하사&quot; &quot;우리나라&quot;
+## [8] &quot;만세&quot;</code></pre>
+</div>
+<div id="str_trim" class="section level2">
+<h2>str_trim</h2>
+<p><code>str_trim</code> 함수는 문자열 양 옆의 개행 및 공백을 제거하는 기능을 합니다.</p>
+<pre class="r"><code>string &lt;- &quot;\r\n\t\t\t\t 하느님이 보우하사 \r\n\t\t\t\t&quot;
+string %&gt;% 
+  str_trim()
+## [1] &quot;하느님이 보우하사&quot;</code></pre>
+<p>위에서 볼 수 있듯이, <code>str_trim()</code> 함수는 문자열 중간에 있는 개행 및 공백을 제거하지는 못합니다. 이를 위해서는 다음에 배울 정규표현식이 필요합니다.</p>
+<hr />
+</div>
+<div id="참고-list를-vector로-변환하는-방법" class="section level2">
+<h2>참고 : list를 vector로 변환하는 방법</h2>
+<p>앞서 살펴본 몇몇 함수들에서, 결과를 list로 반환하는 함수들이 존재했습니다. 이렇게 list로 반환된 결과를 vector로 변환하는 방법에 대해 알아보고자 합니다.</p>
+<p>먼저 가장 간단한 방법으로 <code>unlist()</code> 함수를 통해 list를 vector로 바꿔줄 수 있습니다.</p>
+<pre class="r"><code>string &lt;- &quot;동해물과 백두산이 마르고 닳도록 하느님이 보우하사 우리나라 만세&quot;
+
+string %&gt;% 
+  str_extract_all(pattern = &quot;우&quot;) %&gt;% # list 형태로 출력
+  unlist() # list 형태를 해제하고 vector 형태로 출력
+## [1] &quot;우&quot; &quot;우&quot;</code></pre>
+<p>다음으로 <code>sapply(X = , FUN = )</code> 함수는 X에 할당된 list 혹은 vector의 각각의 원소에 접근하여 FUN에 할당된 함수를 적용합니다. 이를 활용하여 list를 슬라이싱 해 list로부터 vector를 얻을 수 있습니다.</p>
+<pre class="r"><code>addr &lt;- c(&quot;서울 강남구&quot;, &quot;경기도 수원시&quot;, &quot;인천광역시 남구&quot;)
+
+sido &lt;- addr %&gt;% 
+  str_split(pattern = &quot; &quot;) %&gt;% 
+  sapply(FUN = `[[`, 1) # `[[` : slicing을 하는 함수를 표현
+
+gu &lt;- addr %&gt;% 
+  str_split(pattern = &quot; &quot;) %&gt;% 
+  sapply(FUN = `[[`, 2)</code></pre>
+</div>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+<script src="/js/math-code.js"></script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+  </body>
+</html>
+
